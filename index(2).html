@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripControl — Formatura Bolívia 2026</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d2e;--surface2:#222640;--accent:#f59e0b;--accent2:#ef4444;--text:#e2e8f0;--text2:#94a3b8;--border:#2d3561;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--radius:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+#setup-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:100%;max-width:500px;}
+.setup-card h1{font-size:22px;font-weight:700;margin-bottom:6px;}
+.setup-card p{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6;}
+.setup-step{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:12px;}
+.setup-step-num{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.setup-step p{font-size:12px;color:var(--text2);margin:0;}
+.inp-label{font-size:11px;color:var(--text2);margin-bottom:5px;display:block;margin-top:14px;}
+input[type=text],input[type=number],select,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:12px;width:100%;outline:none;transition:border .2s;font-family:inherit;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:60px;}
+button.btn{background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s;}
+button.btn:hover{opacity:.85;}
+button.btn-success{background:var(--success);}
+button.btn-danger{background:var(--danger);}
+button.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2);}
+button.btn-sm{padding:5px 12px;font-size:11px;}
+button.btn-full{width:100%;padding:12px;font-size:14px;margin-top:8px;}
+button.btn-icon{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:background .15s;}
+button.btn-icon:hover{background:var(--surface);}
+#app{display:none;}
+.header{background:linear-gradient(135deg,#1a1d2e,#2d1a00);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo h1{font-size:16px;font-weight:700;}
+.logo span{font-size:10px;color:var(--text2);}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;}
+.badge-accent{background:rgba(245,158,11,.15);color:var(--accent);border:1px solid rgba(245,158,11,.3);}
+.badge-green{background:rgba(16,185,129,.15);color:var(--success);}
+.badge-yellow{background:rgba(245,158,11,.15);color:var(--warning);}
+.badge-red{background:rgba(239,68,68,.15);color:var(--danger);}
+.badge-gray{background:rgba(148,163,184,.1);color:var(--text2);}
+.badge-teal{background:rgba(0,212,170,.12);color:#00d4aa;}
+.tabs{display:flex;gap:2px;padding:12px 24px 0;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;}
+.tab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--text2);border:none;background:transparent;white-space:nowrap;}
+.tab.active{background:var(--bg);color:var(--text);border:1px solid var(--border);border-bottom:1px solid var(--bg);}
+.tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.05);}
+.content{padding:22px 24px;max-width:1400px;margin:0 auto;}
+.page{display:none;}.page.active{display:block;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;-webkit-overflow-scrolling:touch;}
+.card-title{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.kpi-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:5px;}
+.kpi-value{font-size:22px;font-weight:700;letter-spacing:-1px;}
+.kpi-sub{font-size:10px;color:var(--text2);margin-top:2px;}
+.kpi.green .kpi-value{color:var(--success);}
+.kpi.yellow .kpi-value{color:var(--warning);}
+.kpi.red .kpi-value{color:var(--danger);}
+.kpi.orange .kpi-value{color:var(--accent);}
+.kpi.teal .kpi-value{color:#00d4aa;}
+.section-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.section-title::before{content:'';width:3px;height:15px;background:var(--accent);border-radius:2px;}
+.mb-16{margin-bottom:16px;}.mb-20{margin-bottom:20px;}.mb-24{margin-bottom:24px;}.mt-16{margin-top:16px;}
+.alert{padding:11px 14px;border-radius:9px;font-size:12px;margin-bottom:14px;display:flex;gap:9px;align-items:flex-start;line-height:1.5;}
+.alert-warning{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fcd34d;}
+.alert-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;}
+.alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
+.alert-info{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fde68a;}
+.progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+.fill-green{background:linear-gradient(90deg,var(--success),#00d4aa);}
+.fill-yellow{background:linear-gradient(90deg,var(--warning),#ffb347);}
+.fill-accent{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.fill-red{background:linear-gradient(90deg,var(--danger),#ff8c69);}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:480px;}
+th{background:var(--surface2);color:var(--text2);font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:8px 11px;text-align:left;border-bottom:1px solid var(--border);}
+td{padding:9px 11px;border-bottom:1px solid rgba(45,53,97,.35);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(245,158,11,.03);}
+.cell-ok{color:var(--success);font-weight:600;}
+.cell-bad{color:var(--danger);font-weight:600;}
+.cell-warn{color:var(--warning);font-weight:600;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.contrib-cell{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:600;}
+.contrib-ok{background:rgba(16,185,129,.15);color:var(--success);}
+.contrib-zero{background:rgba(239,68,68,.1);color:var(--danger);}
+.contrib-partial{background:rgba(245,158,11,.15);color:var(--warning);}
+.cbadge{display:inline-block;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:600;margin-left:2px;}
+.cbadge-ok{background:rgba(16,185,129,.15);color:var(--success);}
+.cbadge-pend{background:rgba(245,158,11,.15);color:var(--warning);}
+.cbadge-sem{background:rgba(239,68,68,.12);color:var(--danger);}
+.person-row{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--surface2);border-radius:9px;margin-bottom:7px;}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.person-info{flex:1;}
+.person-name{font-size:12px;font-weight:600;}
+.person-sub{font-size:10px;color:var(--text2);}
+.rule-item{padding:9px 0;border-bottom:1px solid rgba(45,53,97,.4);display:flex;gap:9px;align-items:flex-start;}
+.rule-item:last-child{border-bottom:none;}
+.rule-num{background:var(--accent);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.rule-text{font-size:12px;line-height:1.6;}
+.budget-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(45,53,97,.35);}
+.budget-item:last-child{border-bottom:none;}
+.budget-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.highlight-box{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.05));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px;}
+.fonte-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.fonte-card a{color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;}
+.fonte-card a:hover{text-decoration:underline;}
+.cambio-box{background:linear-gradient(135deg,rgba(245,158,11,.07),rgba(239,68,68,.04));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:16px;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:90%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:14px;font-weight:700;margin-bottom:14px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+.input-group{margin-bottom:11px;}
+/* LOADER */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* SYNC */
+#sync-status{position:fixed;bottom:16px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:11px;display:flex;align-items:center;gap:6px;z-index:999;transition:opacity .4s;opacity:0;}
+#sync-status.show{opacity:1;}
+/* FIX SAFARI */
+.card{-webkit-overflow-scrolling:touch;}
+/* RESPONSIVO */
+@media(max-width:768px){
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .grid4{grid-template-columns:1fr 1fr;}
+  .content{padding:12px;}
+  .mb-16{margin-bottom:12px;}.mb-20{margin-bottom:14px;}.mb-24{margin-bottom:16px;}
+  .header{padding:10px 14px;flex-wrap:wrap;gap:8px;}
+  .header-right .badge:nth-child(n+3){display:none;}
+  .logo h1{font-size:14px;}.logo span{display:none;}
+  .logo-icon{width:30px;height:30px;font-size:15px;}
+  .tabs{padding:8px 12px 0;}
+  .tab{padding:7px 11px;font-size:11px;}
+  .kpi{padding:12px;}.kpi-value{font-size:18px;}.kpi-label,.kpi-sub{font-size:9px;}
+  .card{padding:12px;}.card-title{font-size:9px;}
+  .card,[style*="overflow-x:auto"]{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+  table{font-size:11px;}
+  th{padding:7px 8px;font-size:9px;}td{padding:7px 8px;}
+  .person-row{padding:8px 10px;gap:8px;}
+  .avatar{width:28px;height:28px;font-size:11px;}
+  .person-name{font-size:11px;}.person-sub{font-size:9px;}
+  .btn-icon{width:28px!important;height:28px!important;}
+  .cbadge{font-size:8px!important;padding:1px 4px!important;}
+  .contrib-cell{font-size:10px!important;padding:2px 5px!important;}
+  .section-title{font-size:13px;}
+  .alert{font-size:11px;padding:10px 12px;}
+  .modal{width:96%!important;max-width:96%!important;padding:18px;margin:0 8px;}
+  .modal-footer{flex-direction:column;}
+  .modal-footer button{width:100%;}
+  .setup-card{padding:22px 18px;}.setup-card h1{font-size:18px;}
+  .rule-text{font-size:11px;}
+  #sync-status{bottom:12px;right:12px;font-size:10px;padding:6px 10px;}
+  td > div{flex-wrap:wrap;gap:3px!important;}
+}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup-screen">
+  <div class="setup-card">
+    <div style="font-size:28px;margin-bottom:12px;">🇧🇴</div>
+    <h1>TripControl — Bolívia 2026</h1>
+    <p>Cole as credenciais do Supabase deste projeto para acessar a plataforma colaborativa.</p>
+    <div class="setup-step">
+      <div class="setup-step-num">PASSO 1</div>
+      <p>Crie um novo projeto no Supabase e execute o <strong>seed.sql</strong> no SQL Editor.</p>
+    </div>
+    <div class="setup-step">
+      <div class="setup-step-num">PASSO 2</div>
+      <p>Copie a Project URL e a Anon Key em Settings → API.</p>
+    </div>
+    <label class="inp-label">Supabase URL</label>
+    <input type="text" id="cfg-url" placeholder="https://xxxxxxxxxxxx.supabase.co" />
+    <label class="inp-label">Supabase Anon Key</label>
+    <input type="text" id="cfg-key" placeholder="eyJhbGci..." />
+    <label class="inp-label">Seu nome</label>
+    <select id="cfg-nome">
+      <option value="">Selecione</option>
+      <option>Arthur</option><option>Caio</option><option>Enzo</option>
+      <option>Jhonatan</option><option>Rodrigo</option><option>Pedro</option>
+    </select>
+    <button class="btn btn-full" onclick="salvarConfig()">Entrar na Plataforma →</button>
+    <p id="cfg-error" style="color:var(--danger);font-size:11px;margin-top:10px;display:none;"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🇧🇴</div>
+    <div><h1>TripControl</h1><span>Formatura 2026 — Bolívia</span></div>
+  </div>
+  <div class="header-right">
+    <span class="badge badge-accent">6 participantes</span>
+    <span class="badge badge-teal" id="hdr-caixa">Carregando...</span>
+    <span class="badge badge-gray" id="hdr-usuario"></span>
+    <button class="btn btn-sm btn-outline" onclick="logout()" style="font-size:10px;padding:4px 10px;">Sair</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showPage('overview',this)">📊 Visão Geral</button>
+  <button class="tab" onclick="showPage('aportes',this)">💰 Aportes</button>
+  <button class="tab" onclick="showPage('comprovantes',this)">📎 Comprovantes</button>
+  <button class="tab" onclick="showPage('extrato',this)">🏦 Extrato Arthur</button>
+  <button class="tab" onclick="showPage('orcamento',this)">🗺️ Orçamento Bolívia</button>
+  <button class="tab" onclick="showPage('projecao',this)">📈 Projeção</button>
+  <button class="tab" onclick="showPage('decisoes',this)">✅ Decisões</button>
+  <button class="tab" onclick="showPage('governanca',this)">🔒 Governança</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="page-overview" class="page active content">
+  <div class="alert alert-danger mb-20">
+    <span>🚨</span>
+    <div><strong>Jhonatan: R$0 em 7 meses.</strong> R$2.000 de deficit. Decisão mais urgente do projeto.</div>
+  </div>
+  <div class="grid4 mb-20">
+    <div class="kpi teal"><div class="kpi-label">Total no Caixa</div><div class="kpi-value" id="kpi-caixa">—</div><div class="kpi-sub" id="kpi-caixa-sub">carregando</div></div>
+    <div class="kpi red"><div class="kpi-label">Dívidas Acumuladas</div><div class="kpi-value">R$3.840</div><div class="kpi-sub">Arthur R$300 · Enzo R$600 · Pedro R$940 · Jhonatan R$2.000</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Meses Restantes</div><div class="kpi-value">~8</div><div class="kpi-sub">Meta: out–nov/2026 ou jan/2027</div></div>
+    <div class="kpi orange"><div class="kpi-label">Meta Estimada (mid)</div><div class="kpi-value">R$30k</div><div class="kpi-sub">6 × R$5.000/pessoa · Bolívia 10 dias</div></div>
+  </div>
+  <div class="grid2 mb-20">
+    <div class="card">
+      <div class="card-title">Status Individual — Abr/2026</div>
+      <div id="pessoas-overview"><div style="text-align:center;padding:20px;color:var(--text2);"><span class="loader"></span>Carregando...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Saúde do Projeto</div>
+      <div id="saude-overview"><div style="text-align:center;padding:20px;color:var(--text2);"><span class="loader"></span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- APORTES -->
+<div id="page-aportes" class="page content">
+  <div style="display:flex;justify-content:space-between;align-items:center;" class="mb-16">
+    <div class="section-title" style="margin-bottom:0;">Tabela de Aportes</div>
+    <button class="btn btn-sm" onclick="abrirModalAporte()">+ Registrar Aporte</button>
+  </div>
+  <div class="alert alert-info mb-16">
+    <span>ℹ️</span>
+    <div>✏️ edita · 🗑️ exclui (abr/26+). Badges: <span class="cbadge cbadge-ok">✓ comp.</span> confirmado · <span class="cbadge cbadge-pend">⏳ pend.</span> pendente · <span class="cbadge cbadge-sem">sem comp.</span></div>
+  </div>
+  <div class="card mb-20" style="overflow-x:auto;">
+    <div id="tabela-aportes-container"><div style="text-align:center;padding:30px;color:var(--text2);"><span class="loader"></span>Carregando...</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card" id="card-dividas"><div class="card-title">Saldo Negativo por Pessoa</div><div style="text-align:center;padding:14px;color:var(--text2);"><span class="loader"></span></div></div>
+    <div class="card" id="card-pontualidade"><div class="card-title">Análise de Pontualidade</div><div style="text-align:center;padding:14px;color:var(--text2);"><span class="loader"></span></div></div>
+  </div>
+</div>
+
+<!-- COMPROVANTES -->
+<div id="page-comprovantes" class="page content">
+  <div style="display:flex;justify-content:space-between;align-items:center;" class="mb-16">
+    <div class="section-title" style="margin-bottom:0;">Comprovantes de Pagamento</div>
+    <button class="btn btn-sm" onclick="abrirModalComp()">+ Adicionar Comprovante</button>
+  </div>
+  <div class="alert alert-info mb-16"><span>📎</span><div>Depois de depositar, adicione o comprovante aqui. O controlador confirma. Sem comprovante = aporte não validado.</div></div>
+  <div class="card" style="overflow-x:auto;"><div id="tabela-comp-container"><div style="text-align:center;padding:30px;color:var(--text2);"><span class="loader"></span>Carregando...</div></div></div>
+</div>
+
+<!-- EXTRATO ARTHUR -->
+<div id="page-extrato" class="page content">
+  <div class="alert alert-danger mb-16"><span>🚨</span><div><strong>Arthur:</strong> Poste aqui mensalmente o extrato do Inter com posição real dos investimentos. Prazo: até dia 5 de cada mês.</div></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;" class="mb-16">
+    <div class="section-title" style="margin-bottom:0;">Extratos Mensais (Inter)</div>
+    <button class="btn btn-sm" onclick="abrirModalExtrato()">+ Postar Extrato</button>
+  </div>
+  <div class="card" style="overflow-x:auto;" id="tabela-extrato-container"><div style="text-align:center;padding:30px;color:var(--text2);"><span class="loader"></span>Carregando...</div></div>
+</div>
+
+<!-- ORÇAMENTO BOLÍVIA -->
+<div id="page-orcamento" class="page content">
+  <div class="alert alert-success mb-16">
+    <span>📊</span>
+    <div>Dados reais 2025/2026. Câmbio: USD 1 = R$6,00 | BOB 1 ≈ R$0,87. <strong>Bolívia é o destino mais barato da América do Sul — 30–40% mais econômico que o Peru.</strong></div>
+  </div>
+
+  <div class="section-title mb-16">Estimativa por Pessoa — 10 dias (La Paz + Uyuni + Sucre)</div>
+  <div class="grid3 mb-20">
+    <div class="card">
+      <div style="font-size:11px;font-weight:600;color:#00d4aa;margin-bottom:8px;">💡 ECONÔMICO</div>
+      <div style="font-size:24px;font-weight:700;color:#00d4aa;">R$3.200</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:10px;">hostel dorm · transporte local · restaurantes populares</div>
+      <div class="budget-item"><div class="budget-dot" style="background:#6c63ff;"></div><div style="flex:1;font-size:12px;">Passagem GRU↔LPB (via São Paulo)</div><strong style="font-size:12px;">R$1.800</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#f59e0b;"></div><div style="flex:1;font-size:12px;">Hospedagem (10 noites hostel)</div><strong style="font-size:12px;">R$450</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#ff6b6b;"></div><div style="flex:1;font-size:12px;">Alimentação (10 dias)</div><strong style="font-size:12px;">R$350</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#a78bfa;"></div><div style="flex:1;font-size:12px;">Tour Salar de Uyuni (2D/1N)</div><strong style="font-size:12px;">R$300</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#10b981;"></div><div style="flex:1;font-size:12px;">Death Road (bike tour)</div><strong style="font-size:12px;">R$180</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#64748b;"></div><div style="flex:1;font-size:12px;">Transporte interno + passeios</div><strong style="font-size:12px;">R$120</strong></div>
+    </div>
+
+    <div class="card" style="border-color:rgba(245,158,11,.35);">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:8px;">⭐ MÉDIO — RECOMENDADO</div>
+      <div style="font-size:24px;font-weight:700;color:var(--accent);">R$5.000</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:10px;">hostel privativo / hotel 2★ · restaurantes mid</div>
+      <div class="budget-item"><div class="budget-dot" style="background:#6c63ff;"></div><div style="flex:1;font-size:12px;">Passagem GRU↔LPB</div><strong style="font-size:12px;">R$2.200</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#f59e0b;"></div><div style="flex:1;font-size:12px;">Hospedagem (10 noites)</div><strong style="font-size:12px;">R$700</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#ff6b6b;"></div><div style="flex:1;font-size:12px;">Alimentação (10 dias)</div><strong style="font-size:12px;">R$550</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#a78bfa;"></div><div style="flex:1;font-size:12px;">Tour Salar de Uyuni (3D/2N)</div><strong style="font-size:12px;">R$520</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#10b981;"></div><div style="flex:1;font-size:12px;">Death Road + passeios La Paz</div><strong style="font-size:12px;">R$350</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#64748b;"></div><div style="flex:1;font-size:12px;">Transporte interno (ônibus/voo)</div><strong style="font-size:12px;">R$380</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#94a3b8;"></div><div style="flex:1;font-size:12px;">Seguro + reserva (7%)</div><strong style="font-size:12px;">R$300</strong></div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:11px;font-weight:600;color:var(--warning);margin-bottom:8px;">🏆 CONFORTÁVEL</div>
+      <div style="font-size:24px;font-weight:700;color:var(--warning);">R$7.500</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:10px;">hotel 3★ · voos internos · tours privados</div>
+      <div class="budget-item"><div class="budget-dot" style="background:#6c63ff;"></div><div style="flex:1;font-size:12px;">Passagem GRU↔LPB</div><strong style="font-size:12px;">R$2.800</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#f59e0b;"></div><div style="flex:1;font-size:12px;">Hospedagem (hotel 3★)</div><strong style="font-size:12px;">R$1.400</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#ff6b6b;"></div><div style="flex:1;font-size:12px;">Alimentação</div><strong style="font-size:12px;">R$850</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#a78bfa;"></div><div style="flex:1;font-size:12px;">Tour Uyuni + Lagunas privado</div><strong style="font-size:12px;">R$900</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#10b981;"></div><div style="flex:1;font-size:12px;">Death Road + passeios premium</div><strong style="font-size:12px;">R$600</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#64748b;"></div><div style="flex:1;font-size:12px;">Voo doméstico LPB↔UYU</div><strong style="font-size:12px;">R$650</strong></div>
+      <div class="budget-item"><div class="budget-dot" style="background:#94a3b8;"></div><div style="flex:1;font-size:12px;">Seguro + reserva</div><strong style="font-size:12px;">R$300</strong></div>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(239,68,68,.05));border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 18px;" class="mb-20">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:10px;">TOTAL PARA O GRUPO (6 pessoas)</div>
+    <div class="grid3">
+      <div><div style="font-size:10px;color:var(--text2);">Econômico</div><div style="font-size:20px;font-weight:700;color:#00d4aa;">R$19.200</div><div style="font-size:10px;color:var(--text2);">6 × R$3.200</div></div>
+      <div><div style="font-size:10px;color:var(--text2);">Médio</div><div style="font-size:20px;font-weight:700;color:var(--accent);">R$30.000</div><div style="font-size:10px;color:var(--text2);">6 × R$5.000</div></div>
+      <div><div style="font-size:10px;color:var(--text2);">Confortável</div><div style="font-size:20px;font-weight:700;color:var(--warning);">R$45.000</div><div style="font-size:10px;color:var(--text2);">6 × R$7.500</div></div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:12px;color:var(--text2);">Com R$8.160 em caixa → falta <strong style="color:#00d4aa;">R$11.040</strong> (econômico) | <strong style="color:var(--accent);">R$21.840</strong> (médio). <strong style="color:var(--success);">Bolívia é R$9.000 mais barata que o Peru no cenário médio.</strong></div>
+  </div>
+
+  <div class="section-title mb-16">Roteiro Dia a Dia — 10 dias</div>
+  <div class="card mb-20" style="overflow-x:auto;">
+    <table>
+      <thead><tr><th>Dia</th><th>Destino</th><th>Atividade Principal</th><th>Custo est./pessoa</th><th>⚠️ Atenção</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Dia 1</strong></td><td>La Paz</td><td>Chegada El Alto Airport (4.000m) · transfer para La Paz (3.600m) · descanso obrigatório</td><td>R$80</td><td style="color:var(--danger);font-size:11px;">Altitude! Não fazer nada pesado no 1º dia</td></tr>
+        <tr><td><strong>Dia 2</strong></td><td>La Paz</td><td>Aclimatação · Plaza Murillo · Mercado das Bruxas (Witches Market) · Teleférico (Mi Teleférico) · Mercado Lanza</td><td>R$120</td><td style="font-size:11px;">Teleférico: ~R$3/trecho. Vista incrível da cidade</td></tr>
+        <tr><td><strong>Dia 3</strong></td><td>La Paz</td><td>Death Road — tour de bicicleta (64km descida) · Valle de la Luna</td><td>R$270</td><td style="color:var(--warning);font-size:11px;">Incluir seguro. Operadoras: Gravity Bolivia, Barracuda</td></tr>
+        <tr><td><strong>Dia 4</strong></td><td>La Paz → Copacabana</td><td>Ônibus La Paz → Copacabana (3h) · Lago Titicaca · Catedral</td><td>R$100</td><td style="font-size:11px;">Ônibus ~R$35. Lago Titicaca: 3.800m altitude</td></tr>
+        <tr><td><strong>Dia 5</strong></td><td>Ilha do Sol</td><td>Barco Copacabana → Ilha do Sol · trilha norte-sul · pôr do sol no Titicaca</td><td>R$120</td><td style="font-size:11px;">Barco ~R$35 ida/volta. Uma das vistas mais bonitas da América do Sul</td></tr>
+        <tr><td><strong>Dia 6</strong></td><td>Copacabana → Uyuni</td><td>Volta La Paz · ônibus noturno La Paz → Uyuni (10–12h)</td><td>R$180</td><td style="color:var(--warning);font-size:11px;">Ônibus noturno semi-cama ~R$100. Ou voo LPB→UYU ~R$350</td></tr>
+        <tr><td><strong>Dia 7</strong></td><td>Salar de Uyuni</td><td>Tour dia 1: Salar · Isla Incahuasi (cactos gigantes) · fotos perspectiva · pôr do sol no sal</td><td>R$260</td><td style="color:var(--success);font-size:11px;">Jan–Abr: efeito espelho (chuva). Mai–Nov: seco, sal branco. Ambos são incríveis.</td></tr>
+        <tr><td><strong>Dia 8</strong></td><td>Reserva Eduardo Avaroa</td><td>Tour dia 2: Laguna Colorada (flamingos) · Laguna Verde · Geysers Sol de Mañana (4.850m!)</td><td>R$0 (incluso tour)</td><td style="color:var(--danger);font-size:11px;">Geysers às 5h da manhã, faz -10°C. Levar roupa de frio</td></tr>
+        <tr><td><strong>Dia 9</strong></td><td>Uyuni → Sucre</td><td>Volta Uyuni · ônibus ou voo para Sucre · cidade colonial branca</td><td>R$220</td><td style="font-size:11px;">Sucre: altitude 2.750m, mais amena que La Paz</td></tr>
+        <tr><td><strong>Dia 10</strong></td><td>Sucre + Retorno</td><td>City tour Sucre · Casa de la Libertad · mercado · voo Sucre → La Paz → GRU</td><td>R$300</td><td style="font-size:11px;">Sucre tem ótima gastronomia e climate agradável</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title mb-16">Destinos em Detalhe</div>
+  <div class="grid2 mb-20">
+    <div class="card">
+      <div class="card-title" style="color:var(--accent);">🧂 Salar de Uyuni — O maior do mundo</div>
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>Tour 1 dia (~$30–40/p):</strong> Saída manhã, Salar + Isla Incahuasi + pôr do sol. Básico mas suficiente.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Tour 2 dias/1 noite (~$60–80/p):</strong> Inclui noite no Salar ou em Uyuni. Mais imersivo.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>Tour 3 dias/2 noites (~$80–120/p):</strong> Laguna Colorada, Laguna Verde, Geysers. <strong>O mais completo — recomendado.</strong></div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>Efeito espelho:</strong> Jan–Abr (chuva fina cobre o sal de água → reflexo perfeito). Mai–Nov (sal branco seco, visual clássico). Ambos valem.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>Operadoras em Uyuni:</strong> Red Planet, Cordillera Traveller, Tonito Tours. Contratar direto em Uyuni é mais barato que via agência de La Paz.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--accent2);">💀 Death Road — Camino de la Muerte</div>
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>O que é:</strong> 64km de descida de bicicleta de La Cumbre (4.700m) até Coroico (1.200m). Vista incrível, adrenalina garantida.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Preço:</strong> ~$25–35/pessoa incluindo bike, equipamento, guia, almoço e transporte. Em BRL: ~R$150–210/pessoa.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>Dificuldade:</strong> Fácil a moderada. Não precisa ser expert em bike. Guia acompanha o grupo todo tempo.</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>Operadoras:</strong> Gravity Bolivia (a melhor, ~$35), Barracuda Biking (~$28). Reservar com antecedência.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>Melhor época:</strong> Maio–Outubro (seco). Na chuva a estrada fica escorregadia — mais perigoso.</div></div>
+    </div>
+  </div>
+
+  <div class="section-title mb-16">Onde Comprar Cada Coisa</div>
+  <div class="grid3 mb-20">
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">✈️ PASSAGEM INTERNACIONAL</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">GRU → LPB (La Paz). Conexão em Lima (LATAM), Bogotá (Avianca) ou Santa Cruz. Direto não existe.</div>
+      <a href="https://www.google.com/flights" target="_blank">Google Flights →</a><br>
+      <a href="https://www.latamairlines.com" target="_blank" style="margin-top:4px;display:inline-block;">LATAM Airlines →</a><br>
+      <a href="https://www.decolar.com" target="_blank" style="margin-top:4px;display:inline-block;">Decolar →</a>
+      <div style="font-size:10px;color:var(--warning);margin-top:6px;">⚠️ Comprar com 4–5 meses de antecedência</div>
+    </div>
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">🧂 TOUR SALAR DE UYUNI</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">Contratar diretamente em Uyuni é 20–30% mais barato. Ou reservar online com antecedência.</div>
+      <a href="https://www.viator.com/Bolivia/d757-ttd" target="_blank">Viator Bolivia →</a><br>
+      <a href="https://www.getyourguide.com/uyuni-l97226/" target="_blank" style="margin-top:4px;display:inline-block;">GetYourGuide Uyuni →</a>
+      <div style="font-size:10px;color:var(--success);margin-top:6px;">✓ Reservar 2–3 semanas antes (grupos de 6)</div>
+    </div>
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">💀 DEATH ROAD</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">Gravity Bolivia é a operadora mais renomada. Barracuda Biking é boa opção mais econômica.</div>
+      <a href="https://www.gravitybolivia.com" target="_blank">Gravity Bolivia →</a><br>
+      <a href="https://www.barracudabiking.com" target="_blank" style="margin-top:4px;display:inline-block;">Barracuda Biking →</a>
+      <div style="font-size:10px;color:var(--warning);margin-top:6px;">⚠️ Reservar com 1–2 semanas de antecedência</div>
+    </div>
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">🏨 HOSPEDAGEM</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">La Paz: Wild Rover, Loki La Paz (~R$50–80/noite privativo). Uyuni: Hotel Luna Salada (~R$80–150).</div>
+      <a href="https://www.booking.com/city/bo/la-paz.html" target="_blank">Booking.com La Paz →</a><br>
+      <a href="https://www.hostelworld.com/find/Bolivia" target="_blank" style="margin-top:4px;display:inline-block;">Hostelworld Bolívia →</a>
+    </div>
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">🚌 TRANSPORTE INTERNO</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">La Paz→Uyuni: ônibus ~10–12h (~R$80–120). Voo BoA/Amaszonas ~$60–80. La Paz→Copacabana: 3h ~R$35.</div>
+      <a href="https://www.boliviana-de-aviacion.com.bo" target="_blank">BoA (Boliviana) →</a><br>
+      <a href="https://www.busbud.com/pt/passagens-de-onibus/bolivia" target="_blank" style="margin-top:4px;display:inline-block;">BusBud Bolívia →</a>
+    </div>
+    <div class="fonte-card">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">🌊 ILHA DO SOL — TITICACA</div>
+      <div style="font-size:12px;margin-bottom:8px;line-height:1.6;">Barco de Copacabana. 2h cada lado. Vista do Titicaca com neve ao fundo. Um dos lugares mais bonitos da viagem.</div>
+      <a href="https://www.getyourguide.com/lake-titicaca-l97230/" target="_blank">GetYourGuide Titicaca →</a>
+      <div style="font-size:10px;color:var(--success);margin-top:6px;">✓ Pode contratar em Copacabana no dia</div>
+    </div>
+  </div>
+
+  <div class="section-title mb-16">Melhor Época e Clima</div>
+  <div class="grid2 mb-20">
+    <div class="card">
+      <div class="card-title" style="color:var(--success);">✅ Quando ir (2026)</div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--success);">★</div><div class="rule-text"><strong>Mai–Out/2026 (seca):</strong> Céu azul, Death Road seco, Salar branco clássico. <strong>Melhor época para o grupo.</strong></div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--success);">★</div><div class="rule-text"><strong>Jan–Mar (chuva):</strong> Efeito espelho no Salar é único no mundo. Vale a pena se o objetivo principal for o Uyuni.</div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--accent);">!</div><div class="rule-text"><strong>Out–Nov/2026:</strong> Transição seca→chuva. Ainda muito bom, menos turistas, preços menores. <strong>Recomendado para o grupo.</strong></div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--danger);">✗</div><div class="rule-text"><strong>Dez/26–Jan/27:</strong> Início das chuvas intensas. Death Road mais arriscado. Algumas estradas fecham.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--warning);">⚡ Alertas Importantes</div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--danger);">!</div><div class="rule-text"><strong>Altitude:</strong> La Paz (3.600m), El Alto (4.000m), Geysers (4.850m). <strong>Aclimatação obrigatória nos 2 primeiros dias.</strong> Sintomas: dor de cabeça, enjoo, cansaço. Coca-tea ajuda.</div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--danger);">!</div><div class="rule-text"><strong>Frio no Salar:</strong> Noites chegam a -10°C / -15°C. Levar casaco de frio real, não jaquetinha. Isso não é exagero.</div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--warning);">!</div><div class="rule-text"><strong>Documentação:</strong> <strong>Brasileiros precisam de passaporte</strong> para entrar na Bolívia. Não aceita RG. Emitir com pelo menos 3 meses de antecedência.</div></div>
+      <div class="rule-item"><div class="rule-num" style="background:var(--accent);">i</div><div class="rule-text"><strong>Passagem:</strong> Comprar com 4–5 meses de antecedência para out/nov/2026. Mai/Junho é o momento ideal.</div></div>
+    </div>
+  </div>
+
+  <div class="section-title mb-16">Câmbio e Dinheiro</div>
+  <div class="cambio-box mb-20">
+    <div class="grid3">
+      <div><div style="font-size:10px;color:var(--text2);margin-bottom:4px;">CÂMBIO REFERÊNCIA</div><div style="font-size:18px;font-weight:700;color:var(--accent);">R$0,87 / BOB</div><div style="font-size:10px;color:var(--text2);">1 Boliviano ≈ R$0,87 (abr/2026)</div></div>
+      <div><div style="font-size:10px;color:var(--text2);margin-bottom:4px;">MELHOR FORMA DE LEVAR</div><div style="font-size:13px;font-weight:600;color:var(--text);">Dólares em espécie</div><div style="font-size:10px;color:var(--text2);">Casas de câmbio em La Paz dão melhor taxa. Notas novas e sem rasuras.</div></div>
+      <div><div style="font-size:10px;color:var(--text2);margin-bottom:4px;">CARTÃO</div><div style="font-size:13px;font-weight:600;color:var(--text);">Wise / Nomad</div><div style="font-size:10px;color:var(--text2);">ATMs cobram taxa por saque. Visa aceito na maioria. Interior aceita só cash.</div></div>
+    </div>
+    <div class="divider"></div>
+    <div style="font-size:11px;color:var(--text2);">⚠️ <strong style="color:var(--text);">Interior da Bolívia é praticamente cashless-free</strong> — em Uyuni e áreas rurais só aceitam dinheiro físico. Sacar em La Paz antes de sair.</div>
+  </div>
+
+  <div class="section-title mb-16">Bolívia vs. Peru — Comparativo para o grupo</div>
+  <div class="card">
+    <table>
+      <thead><tr><th>Critério</th><th>🇧🇴 Bolívia</th><th>🇵🇪 Peru</th><th>Vantagem</th></tr></thead>
+      <tbody>
+        <tr><td>Custo médio/pessoa (10d)</td><td class="cell-ok">R$5.000</td><td class="cell-warn">R$6.500</td><td><span class="badge badge-green">Bolívia 23% mais barata</span></td></tr>
+        <tr><td>Passagem aérea</td><td class="cell-ok">~R$2.200</td><td class="cell-warn">~R$2.400</td><td><span class="badge badge-green">Bolívia</span></td></tr>
+        <tr><td>Hospedagem/noite (hostel priv.)</td><td class="cell-ok">R$60–100</td><td class="cell-warn">R$80–120</td><td><span class="badge badge-green">Bolívia</span></td></tr>
+        <tr><td>Atração principal</td><td>Salar de Uyuni + Death Road</td><td>Machu Picchu</td><td><span class="badge badge-gray">Empate (gostos diferentes)</span></td></tr>
+        <tr><td>Documentação</td><td class="cell-bad">Passaporte obrigatório</td><td class="cell-ok">Passaporte obrigatório</td><td><span class="badge badge-gray">Igual</span></td></tr>
+        <tr><td>Altitude / mal de altitude</td><td class="cell-bad">Mais severa (3.600–4.850m)</td><td class="cell-warn">Moderada (3.400m Cusco)</td><td><span class="badge badge-yellow">Peru levemente melhor</span></td></tr>
+        <tr><td>Facilidade logística</td><td class="cell-warn">Média (transporte precário)</td><td class="cell-ok">Boa (trem, voos domésticos)</td><td><span class="badge badge-yellow">Peru</span></td></tr>
+        <tr><td>Experiência única</td><td>Salar efeito espelho / Death Road</td><td>Machu Picchu</td><td><span class="badge badge-gray">Depende da preferência</span></td></tr>
+        <tr><td>Viabilidade com caixa atual</td><td class="cell-ok">Mais viável (meta R$30k)</td><td class="cell-warn">Exige mais poupança (R$39k)</td><td><span class="badge badge-green">Bolívia</span></td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:var(--text2);margin-top:10px;padding:10px;background:rgba(16,185,129,.07);border-radius:8px;border-left:3px solid var(--success);">
+      <strong style="color:var(--success);">Conclusão financeira:</strong> Com o caixa atual de R$8.160 e R$400/pessoa/mês por 8 meses, vocês chegam em nov/2026 com ~R$27.360 — cobre o cenário médio da Bolívia (R$30.000) com folga se as dívidas forem quitadas.
+    </div>
+  </div>
+</div>
+
+<!-- PROJEÇÃO -->
+<div id="page-projecao" class="page content">
+  <div class="section-title mb-16">Projeção de Caixa — a partir de Abr/2026</div>
+  <div class="grid3 mb-16">
+    <div class="kpi red"><div class="kpi-label">Cenário atual (R$300/pessoa)</div><div class="kpi-value" id="proj-300">—</div><div class="kpi-sub">em nov/2026</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Cenário R$400/pessoa</div><div class="kpi-value" id="proj-400">—</div><div class="kpi-sub">em nov/2026</div></div>
+    <div class="kpi green"><div class="kpi-label">Cenário R$500/pessoa</div><div class="kpi-value" id="proj-500">—</div><div class="kpi-sub">em nov/2026</div></div>
+  </div>
+  <div class="card mb-16" style="overflow-x:auto;"><div id="tabela-projecao"></div></div>
+  <div class="alert alert-warning">
+    <span>💡</span>
+    <div><strong>Bolívia é mais acessível:</strong> Com R$400/pessoa, chegam em nov/2026 com ~R$27.360 — <strong>já cobre quase todo o cenário médio (R$30.000)</strong>. Somando a quitação das dívidas em atraso (~R$3.840), fecharia exato.</div>
+  </div>
+</div>
+
+<!-- DECISÕES -->
+<div id="page-decisoes" class="page content">
+  <div class="section-title mb-16">Decisões do Projeto</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🔴</span><strong style="font-size:13px;">D1 — Jhonatan: votação formal até mai/2026</strong><span class="badge badge-red">Bloqueante</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">7 meses, R$0. Opções: (A) Plano de nivelamento documentado + mensalidade em dia. (B) Grupo subsidia com limite. (C) Jhonatan fora.</div>
+    </div>
+    <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🔴</span><strong style="font-size:13px;">D2 — Extrato completo do Arthur</strong><span class="badge badge-red">Urgente</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Saldo real, posição dos investimentos, rendimentos desde set/25. Postar na aba "Extrato Arthur".</div>
+    </div>
+    <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🔴</span><strong style="font-size:13px;">D3 — Migrar renda variável para CDB liquidez diária</strong><span class="badge badge-red">Crítico</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Com 8 meses até a viagem, renda variável é inadequada. CDB liq. diária no Inter resolve.</div>
+    </div>
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🟡</span><strong style="font-size:13px;">D4 — Peru ou Bolívia? Votação final</strong><span class="badge badge-yellow">Alta</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Dois destinos mapeados com orçamento real. Bolívia ~R$9k mais barata no cenário médio. Grupo precisa votar e fechar.</div>
+    </div>
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🟡</span><strong style="font-size:13px;">D5 — Confirmar datas: out ou nov/2026?</strong><span class="badge badge-yellow">Alta</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Out/26 = mais tempo pra comprar passagem agora (mai/26). Nov/26 = mais caixa acumulado. Votar logo.</div>
+    </div>
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🟡</span><strong style="font-size:13px;">D6 — Elevar aporte para R$400–500/pessoa</strong><span class="badge badge-yellow">Alta</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">R$300 não fecha nem a Bolívia no cenário médio. Com R$400 fecha fácil em nov/2026. Ver aba Projeção.</div>
+    </div>
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>🟡</span><strong style="font-size:13px;">D7 — Verificar passaportes de todos</strong><span class="badge badge-yellow">Alta</span></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;">Bolívia exige passaporte (RG não serve). Todos precisam verificar validade agora. Emissão leva 4–8 semanas.</div>
+    </div>
+    <div style="background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.2);border-radius:10px;padding:14px;opacity:.65;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;"><span>✅</span><strong style="font-size:13px;">Bolívia como destino em análise</strong><span class="badge badge-green">Em avaliação</span></div>
+      <div style="font-size:12px;color:var(--text2);">Plataforma criada. Orçamento mapeado. Aguardando votação final do grupo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- GOVERNANÇA -->
+<div id="page-governanca" class="page content">
+  <div class="grid2 mb-16">
+    <div class="card">
+      <div class="card-title">Papéis e Responsabilidades</div>
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>Arthur (gestor):</strong> Executa movimentações aprovadas. Posta extrato até dia 5 de cada mês. Sem autonomia unilateral acima de R$200.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Enzo (controlador):</strong> Atualiza plataforma, confirma comprovantes, sinaliza discrepâncias. Não movimenta dinheiro.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>Grupo (todos):</strong> Qualquer realocação ou saque &gt; R$200 exige votação com maioria simples.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Regras de Ouro</div>
+      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>Extrato mensal obrigatório</strong> — Arthur posta aqui até dia 5.</div></div>
+      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Zero renda variável</strong> — Apenas CDB liquidez diária ou Tesouro Selic.</div></div>
+      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>Comprovante obrigatório</strong> — Sem comprovante na aba Comprovantes, aporte não validado.</div></div>
+      <div class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>2 meses sem pagar</strong> = participação suspensa até regularização.</div></div>
+      <div class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>Saques</strong> somente para pagamentos aprovados (passagem, hospedagem, tours).</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- MODAIS -->
+<div class="modal-overlay" id="modal-aporte">
+  <div class="modal">
+    <h3 id="modal-aporte-titulo">Registrar Aporte</h3>
+    <div class="input-group"><label class="inp-label">Pessoa</label>
+      <select id="m-pessoa-aporte"><option>Arthur</option><option>Caio</option><option>Enzo</option><option>Jhonatan</option><option>Rodrigo</option><option>Pedro</option></select></div>
+    <div class="input-group"><label class="inp-label">Mês/Ano</label>
+      <select id="m-mes-aporte"><option>abr/26</option><option>mai/26</option><option>jun/26</option><option>jul/26</option><option>ago/26</option><option>set/26</option><option>out/26</option><option>nov/26</option><option>dez/26</option></select></div>
+    <div class="input-group"><label class="inp-label">Valor (R$)</label><input type="number" id="m-valor-aporte" placeholder="300" /></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-aporte')">Cancelar</button>
+      <button class="btn btn-success" onclick="salvarAporte()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-comp">
+  <div class="modal">
+    <h3>Adicionar Comprovante</h3>
+    <div class="input-group"><label class="inp-label">Pessoa</label>
+      <select id="m-pessoa-comp"><option>Arthur</option><option>Caio</option><option>Enzo</option><option>Jhonatan</option><option>Rodrigo</option><option>Pedro</option></select></div>
+    <div class="input-group"><label class="inp-label">Mês/Ano</label>
+      <select id="m-mes-comp"><option>abr/26</option><option>mai/26</option><option>jun/26</option><option>jul/26</option><option>ago/26</option><option>set/26</option><option>out/26</option><option>nov/26</option><option>dez/26</option></select></div>
+    <div class="input-group"><label class="inp-label">Valor (R$)</label><input type="number" id="m-valor-comp" placeholder="300" /></div>
+    <div class="input-group"><label class="inp-label">Link do comprovante</label><input type="text" id="m-link-comp" placeholder="Drive, WhatsApp..." /></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-comp')">Cancelar</button>
+      <button class="btn btn-success" onclick="salvarComp()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-extrato">
+  <div class="modal">
+    <h3>Postar Extrato Mensal</h3>
+    <div class="input-group"><label class="inp-label">Mês/Ano</label>
+      <select id="m-mes-extrato"><option>abr/26</option><option>mai/26</option><option>jun/26</option><option>jul/26</option><option>ago/26</option><option>set/26</option><option>out/26</option><option>nov/26</option><option>dez/26</option></select></div>
+    <div class="input-group"><label class="inp-label">Saldo real (R$)</label><input type="number" id="m-saldo-extrato" placeholder="8160" /></div>
+    <div class="input-group"><label class="inp-label">Rendimentos do mês (R$)</label><input type="number" id="m-rendimentos-extrato" placeholder="85" /></div>
+    <div class="input-group"><label class="inp-label">Composição da carteira</label><input type="text" id="m-composicao-extrato" placeholder="CDB liq. diária: R$8.245" /></div>
+    <div class="input-group"><label class="inp-label">Observações</label><textarea id="m-obs-extrato" placeholder="Notas..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-extrato')">Cancelar</button>
+      <button class="btn btn-success" onclick="salvarExtrato()">Postar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:380px;">
+    <h3>Confirmar ação</h3>
+    <p id="confirm-msg" style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:4px;"></p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirm-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="sync-status"></div>
+
+<script>
+let SUPA_URL='',SUPA_KEY='',USUARIO='';
+const PESSOAS=['Arthur','Caio','Enzo','Jhonatan','Rodrigo','Pedro'];
+const MESES_HISTORICO=['set/25','out/25','nov/25','dez/25','jan/26','fev/26','mar/26'];
+const META_MES={'set/25':300,'out/25':300,'nov/25':300,'dez/25':300,'jan/26':200,'fev/26':300,'mar/26':300};
+const CORES={Arthur:'linear-gradient(135deg,#00d4aa,#0099cc)',Caio:'linear-gradient(135deg,#10b981,#059669)',Enzo:'linear-gradient(135deg,#f59e0b,#d97706)',Jhonatan:'linear-gradient(135deg,#ef4444,#b91c1c)',Rodrigo:'linear-gradient(135deg,#10b981,#065f46)',Pedro:'linear-gradient(135deg,#a78bfa,#7c3aed)'};
+
+function salvarConfig(){
+  const url=document.getElementById('cfg-url').value.trim();
+  const key=document.getElementById('cfg-key').value.trim();
+  const nome=document.getElementById('cfg-nome').value;
+  if(!url||!key||!nome){document.getElementById('cfg-error').textContent='Preencha todos os campos.';document.getElementById('cfg-error').style.display='block';return;}
+  localStorage.setItem('tc_url_bo',url);localStorage.setItem('tc_key_bo',key);localStorage.setItem('tc_user_bo',nome);
+  iniciarApp(url,key,nome);
+}
+function logout(){localStorage.removeItem('tc_url_bo');localStorage.removeItem('tc_key_bo');localStorage.removeItem('tc_user_bo');location.reload();}
+
+async function sbFetch(table,method,body,filter){
+  let url=`${SUPA_URL}/rest/v1/${table}`;
+  if(filter)url+=`?${filter}`;
+  const headers={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':`Bearer ${SUPA_KEY}`};
+  if(method==='POST')headers['Prefer']='return=representation';
+  if(method==='DELETE')headers['Prefer']='return=minimal';
+  const opts={method:method||'GET',headers};
+  if(body)opts.body=JSON.stringify(body);
+  const res=await fetch(url,opts);
+  if(!res.ok){const t=await res.text();throw new Error(`${res.status}: ${t}`);}
+  return(res.status===204||method==='DELETE')?null:res.json();
+}
+
+function syncShow(msg,type){
+  const el=document.getElementById('sync-status');
+  const cor=type==='ok'?'var(--success)':type==='err'?'var(--danger)':'var(--accent)';
+  el.innerHTML=`<span style="color:${cor}">●</span> ${msg}`;
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+function iniciarApp(url,key,user){
+  SUPA_URL=url.replace(/\/$/,'');SUPA_KEY=key;USUARIO=user;
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('hdr-usuario').textContent=user;
+  carregarTudo();
+}
+
+async function carregarTudo(){
+  await Promise.all([carregarAportes(),carregarComprovantes(),carregarExtratos()]);
+  renderProjecao(calcCaixaTotal());
+}
+
+let dadosAportes={},compIdx={};
+
+async function carregarAportes(){
+  try{
+    const rows=await sbFetch('aportes','GET',null,'order=mes.asc');
+    dadosAportes={};
+    rows.forEach(r=>{if(!dadosAportes[r.pessoa])dadosAportes[r.pessoa]={};dadosAportes[r.pessoa][r.mes]={valor:r.valor,id:r.id};});
+    renderAportes();carregarOverview();
+  }catch(e){syncShow('Erro ao carregar aportes','err');}
+}
+
+function calcTotal(p){return Object.values(dadosAportes[p]||{}).reduce((s,v)=>s+(v.valor||0),0);}
+function calcObrigacao(){return MESES_HISTORICO.reduce((s,m)=>s+(META_MES[m]||300),0);}
+function calcDivida(p){return Math.max(0,calcObrigacao()-calcTotal(p));}
+function getMesesContribuidos(p){return MESES_HISTORICO.filter(m=>(dadosAportes[p]||{})[m]?.valor>0).length;}
+function calcCaixaTotal(){return PESSOAS.reduce((s,p)=>s+calcTotal(p),0);}
+
+function ordenarMeses(meses){
+  const mi=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  return [...meses].sort((a,b)=>{const[ma,aa]=a.split('/');const[mb,ab]=b.split('/');return(parseInt(aa)*12+mi.indexOf(ma))-(parseInt(ab)*12+mi.indexOf(mb));});
+}
+
+function renderAportes(){
+  const container=document.getElementById('tabela-aportes-container');
+  const todosMeses=new Set(MESES_HISTORICO);
+  PESSOAS.forEach(p=>Object.keys(dadosAportes[p]||{}).forEach(m=>todosMeses.add(m)));
+  const mesesOrd=ordenarMeses([...todosMeses]);
+  let acum=0,rows='';
+  const totaisPessoa={};PESSOAS.forEach(p=>totaisPessoa[p]=0);
+
+  mesesOrd.forEach(mes=>{
+    const meta=META_MES[mes]||300;
+    const isHistorico=MESES_HISTORICO.includes(mes);
+    let totalMes=0,colunas='';
+    PESSOAS.forEach(p=>{
+      const entry=(dadosAportes[p]||{})[mes];
+      const v=entry?.valor??null;
+      const aportId=entry?.id??null;
+      if(v!==null){totalMes+=v;totaisPessoa[p]+=v;}
+      let cel;
+      if(v===null)cel='<span style="color:var(--border);font-style:italic;font-size:11px;">—</span>';
+      else if(v===0)cel='<span class="contrib-cell contrib-zero">R$0</span>';
+      else if(v<meta)cel=`<span class="contrib-cell contrib-partial">R$${v}</span>`;
+      else cel=`<span class="contrib-cell contrib-ok">R$${v}</span>`;
+      if(v!==null&&v>0){
+        const ck=`${p}|${mes}`;const cs=compIdx[ck];
+        if(cs==='Confirmado')cel+=`<span class="cbadge cbadge-ok">✓ comp.</span>`;
+        else if(cs==='Pendente')cel+=`<span class="cbadge cbadge-pend">⏳ pend.</span>`;
+        else if(!isHistorico)cel+=`<span class="cbadge cbadge-sem">sem comp.</span>`;
+      }
+      let acoes='';
+      if(aportId!==null){
+        acoes+=`<button class="btn-icon" title="Editar" onclick="editarAporte(${aportId},'${p}','${mes}',${v??0})">✏️</button>`;
+        if(!isHistorico)acoes+=`<button class="btn-icon" title="Excluir" onclick="excluirAporte(${aportId},'${p}','${mes}')">🗑️</button>`;
+      }
+      colunas+=`<td><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">${cel}<span style="margin-left:auto;display:flex;gap:2px;">${acoes}</span></div></td>`;
+    });
+    acum+=totalMes;
+    rows+=`<tr><td><strong>${mes}</strong>${!isHistorico?' <span style="font-size:9px;color:#00d4aa;">novo</span>':''}</td><td style="color:var(--text2);">R$${meta}</td>${colunas}<td style="font-weight:600;">R$${totalMes}</td><td style="color:#00d4aa;font-weight:600;">R$${acum}</td></tr>`;
+  });
+
+  let totRow=`<tr style="background:rgba(245,158,11,.05);"><td colspan="2"><strong>TOTAL</strong></td>`;
+  PESSOAS.forEach(p=>{const v=totaisPessoa[p];const cls=v===0?'cell-bad':v<calcObrigacao()?'cell-warn':'cell-ok';totRow+=`<td class="${cls}">R$${v}</td>`;});
+  totRow+=`<td>—</td><td style="color:#00d4aa;font-weight:700;">R$${acum}</td></tr>`;
+
+  container.innerHTML=`<table><thead><tr><th>Mês</th><th>Meta</th>${PESSOAS.map(p=>`<th>${p}</th>`).join('')}<th>Total</th><th>Acumulado</th></tr></thead><tbody>${rows}</tbody><tfoot>${totRow}</tfoot></table>`;
+
+  // Dívidas
+  const divEl=document.getElementById('card-dividas');
+  divEl.innerHTML='<div class="card-title">Saldo Negativo por Pessoa</div>';
+  PESSOAS.forEach(p=>{
+    const div=calcDivida(p);
+    const pct=div===0?100:Math.max(5,100-Math.round(div/calcObrigacao()*100));
+    const cor=div===0?'fill-green':div>1000?'fill-red':'fill-yellow';
+    const bdg=div===0?`<span class="badge badge-green">Em dia ✓</span>`:`<span class="badge badge-red">deve R$${div}</span>`;
+    divEl.innerHTML+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(45,53,97,.3);">
+      <span style="font-size:12px;">${p}</span>
+      <div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar" style="width:90px;"><div class="progress-fill ${cor}" style="width:${pct}%"></div></div>${bdg}</div>
+    </div>`;
+  });
+
+  // Pontualidade
+  const pontEl=document.getElementById('card-pontualidade');
+  const pRows=PESSOAS.map(p=>{
+    const ok=getMesesContribuidos(p);const tot=MESES_HISTORICO.length;const pct=Math.round(ok/tot*100);
+    const bdg=pct===100?'<span class="badge badge-green">100% ⭐</span>':pct===0?'<span class="badge badge-red">0% 🚨</span>':pct>=70?`<span class="badge badge-yellow">${pct}%</span>`:`<span class="badge badge-red">${pct}%</span>`;
+    return`<tr><td>${p}</td><td class="cell-ok">${ok}</td><td class="cell-bad">${tot-ok}</td><td>${bdg}</td></tr>`;
+  }).join('');
+  pontEl.innerHTML=`<div class="card-title">Análise de Pontualidade</div><table><thead><tr><th>Pessoa</th><th>Pagos</th><th>Faltou</th><th>Taxa</th></tr></thead><tbody>${pRows}</tbody></table>`;
+
+  document.getElementById('hdr-caixa').textContent=`Caixa: R$${calcCaixaTotal()}`;
+}
+
+async function carregarOverview(){
+  if(!Object.keys(dadosAportes).length)return;
+  const total=calcCaixaTotal();
+  document.getElementById('kpi-caixa').textContent=`R$${total.toLocaleString('pt-BR')}`;
+  document.getElementById('kpi-caixa-sub').textContent=`${Math.round(total/30000*100)}% da meta Bolívia mid (R$30k)`;
+  const el=document.getElementById('pessoas-overview');
+  el.innerHTML=PESSOAS.map(p=>{
+    const contrib=calcTotal(p);const div=calcDivida(p);
+    const divBadge=div===0?`<span style="font-size:10px;color:var(--success);">Em dia 🟢</span>`:`<span style="font-size:10px;color:var(--danger);">deve R$${div}</span>`;
+    const extra=p==='Arthur'?'<span style="font-size:10px;color:var(--text2);"> (adm)</span>':'';
+    const extra2=p==='Enzo'?'<span style="font-size:10px;color:var(--accent);"> (você)</span>':'';
+    const warn=p==='Jhonatan'?'border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.04);':'';
+    return`<div class="person-row" style="${warn}"><div class="avatar" style="background:${CORES[p]};">${p[0]}</div>
+      <div class="person-info"><div class="person-name">${p}${extra}${extra2}</div><div class="person-sub">${getMesesContribuidos(p)} de ${MESES_HISTORICO.length} meses</div></div>
+      <div style="text-align:right;"><div style="font-size:13px;font-weight:700;">${contrib>0?`R$${contrib}`:'<span style="color:var(--danger)">R$0</span>'}</div>${divBadge}</div>
+    </div>`;
+  }).join('');
+  const saude=document.getElementById('saude-overview');
+  const pct1=Math.min(100,Math.round(total/12000*100));
+  const pct2=Math.min(100,Math.round(total/30000*100));
+  const emDia=PESSOAS.filter(p=>calcDivida(p)===0).length;
+  saude.innerHTML=`
+    <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Arrecadado vs planejado</span><span>${pct1}%</span></div><div class="progress-bar"><div class="progress-fill fill-yellow" style="width:${pct1}%"></div></div></div>
+    <div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Cobertura meta Bolívia mid (R$30k)</span><span>${pct2}%</span></div><div class="progress-bar"><div class="progress-fill fill-accent" style="width:${pct2}%"></div></div></div>
+    <div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Participantes em dia (${emDia}/6)</span><span>${Math.round(emDia/6*100)}%</span></div><div class="progress-bar"><div class="progress-fill fill-green" style="width:${Math.round(emDia/6*100)}%"></div></div></div>
+    <div class="divider"></div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="display:flex;gap:7px;align-items:flex-start;padding:7px;background:rgba(239,68,68,.07);border-radius:7px;border-left:3px solid var(--danger);font-size:11px;"><span>🔴</span><div><strong>Jhonatan</strong> — R$0 em 7 meses. Decidir até mai/26.</div></div>
+      <div style="display:flex;gap:7px;align-items:flex-start;padding:7px;background:rgba(239,68,68,.07);border-radius:7px;border-left:3px solid var(--danger);font-size:11px;"><span>🔴</span><div><strong>Extrato Inter</strong> — Arthur postar na aba "Extrato Arthur".</div></div>
+      <div style="display:flex;gap:7px;align-items:flex-start;padding:7px;background:rgba(245,158,11,.07);border-radius:7px;border-left:3px solid var(--warning);font-size:11px;"><span>🟡</span><div><strong>Votar destino final</strong> — Peru ou Bolívia? Ver aba Decisões.</div></div>
+    </div>`;
+}
+
+async function carregarComprovantes(){
+  try{
+    const rows=await sbFetch('comprovantes','GET',null,'order=created_at.desc');
+    compIdx={};
+    rows.forEach(r=>{const k=`${r.pessoa}|${r.mes}`;if(!compIdx[k]||r.status==='Confirmado')compIdx[k]=r.status;});
+    renderComprovantes(rows);
+  }catch(e){}
+}
+
+function renderComprovantes(rows){
+  const el=document.getElementById('tabela-comp-container');
+  if(!rows||!rows.length){el.innerHTML='<p style="text-align:center;padding:24px;color:var(--text2);">Nenhum comprovante ainda.</p>';return;}
+  const tbody=rows.map(r=>{
+    const cls=r.status==='Confirmado'?'badge-green':'badge-yellow';
+    const btnConf=r.status!=='Confirmado'?`<button class="btn btn-sm btn-success" onclick="confirmarComp(${r.id})" style="margin-left:6px;">Confirmar</button>`:'';
+    const link=r.link?`<a href="${r.link}" target="_blank" style="color:var(--accent);font-size:11px;">ver →</a>`:'<span style="color:var(--text2);font-size:11px;">sem link</span>';
+    return`<tr><td><strong>${r.pessoa}</strong></td><td>${r.mes}</td><td>R$${r.valor}</td><td>${link}</td><td><span class="badge ${cls}">${r.status}</span>${btnConf}</td><td style="color:var(--text2);font-size:11px;">${r.adicionado_em}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<table><thead><tr><th>Pessoa</th><th>Mês</th><th>Valor</th><th>Comprovante</th><th>Status</th><th>Adicionado</th></tr></thead><tbody>${tbody}</tbody></table>`;
+}
+
+async function confirmarComp(id){
+  try{await sbFetch(`comprovantes?id=eq.${id}`,'PATCH',{status:'Confirmado'});syncShow('Confirmado!','ok');carregarComprovantes();}
+  catch(e){syncShow('Erro','err');}
+}
+
+async function carregarExtratos(){
+  try{const rows=await sbFetch('extratos','GET',null,'order=mes.asc');renderExtratos(rows);}catch(e){}
+}
+
+function renderExtratos(rows){
+  const el=document.getElementById('tabela-extrato-container');
+  if(!rows||!rows.length){el.innerHTML='<p style="text-align:center;padding:24px;color:var(--text2);">Nenhum extrato postado. Arthur: poste até dia 5 de cada mês.</p>';return;}
+  const tbody=rows.map(r=>{
+    const cls=r.status==='Confirmado'?'badge-green':'badge-yellow';
+    const btnConf=(r.status||'Pendente')!=='Confirmado'?`<button class="btn btn-sm btn-success" onclick="confirmarExtrato(${r.id})" style="margin-left:6px;">Confirmar</button>`:'';
+    return`<tr><td><strong>${r.mes}</strong></td><td style="color:#00d4aa;font-weight:600;">R$${r.saldo_real}</td><td style="color:var(--success);">+R$${r.rendimentos}</td><td style="font-size:11px;">${r.composicao||'—'}</td><td style="font-size:11px;color:var(--text2);">${r.observacoes||'—'}</td><td><span class="badge ${cls}">${r.status||'Pendente'}</span>${btnConf}</td><td style="font-size:11px;color:var(--text2);">${r.confirmado_por||'—'}</td></tr>`;
+  }).join('');
+  el.innerHTML=`<table><thead><tr><th>Mês</th><th>Saldo Real</th><th>Rendimentos</th><th>Composição</th><th>Obs.</th><th>Status</th><th>Confirmado por</th></tr></thead><tbody>${tbody}</tbody></table>`;
+}
+
+async function confirmarExtrato(id){
+  try{await sbFetch(`extratos?id=eq.${id}`,'PATCH',{status:'Confirmado',confirmado_por:USUARIO});syncShow('Extrato confirmado!','ok');carregarExtratos();}
+  catch(e){syncShow('Erro','err');}
+}
+
+function renderProjecao(base){
+  const meses=['Abr/26','Mai/26','Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26','Jan/27'];
+  const n=8;
+  document.getElementById('proj-300').textContent=`R$${(base+300*6*n).toLocaleString('pt-BR')}`;
+  document.getElementById('proj-400').textContent=`R$${(base+400*6*n).toLocaleString('pt-BR')}`;
+  document.getElementById('proj-500').textContent=`R$${(base+500*6*n).toLocaleString('pt-BR')}`;
+  let rows='';
+  meses.forEach((m,i)=>{
+    const c1=base+300*6*(i+1),c2=base+400*6*(i+1),c3=base+500*6*(i+1);
+    const bdg=p=>p>=90?`<span class="badge badge-green">${p}%</span>`:p>=60?`<span class="badge badge-yellow">${p}%</span>`:`<span class="badge badge-red">${p}%</span>`;
+    const pct=v=>Math.round(v/30000*100);
+    const hl=m==='Nov/26'||m==='Jan/27'?'background:rgba(16,185,129,.04);':'';
+    rows+=`<tr style="${hl}"><td>${m}</td><td>R$${c1.toLocaleString('pt-BR')}</td><td>${bdg(pct(c1))}</td><td>R$${c2.toLocaleString('pt-BR')}</td><td>${bdg(pct(c2))}</td><td>R$${c3.toLocaleString('pt-BR')}</td><td>${bdg(pct(c3))}</td></tr>`;
+  });
+  document.getElementById('tabela-projecao').innerHTML=`<table><thead><tr><th>Mês</th><th>R$300/p</th><th>% meta</th><th>R$400/p</th><th>% meta</th><th>R$500/p</th><th>% meta</th></tr></thead><tbody>${rows}</tbody></table><p style="font-size:10px;color:var(--text2);margin-top:8px;">* Meta: R$30.000 (6 × R$5.000 mid-range Bolívia).</p>`;
+}
+
+// MODAIS
+function abrirModalAporte(id,pessoa,mes,valor){
+  const titulo=document.getElementById('modal-aporte-titulo');
+  if(id){titulo.textContent='Editar Aporte';document.getElementById('m-pessoa-aporte').value=pessoa;document.getElementById('m-mes-aporte').value=mes;document.getElementById('m-valor-aporte').value=valor;document.getElementById('modal-aporte').dataset.editId=id;}
+  else{titulo.textContent='Registrar Aporte';document.getElementById('m-pessoa-aporte').value=USUARIO;delete document.getElementById('modal-aporte').dataset.editId;}
+  document.getElementById('modal-aporte').classList.add('open');
+}
+function editarAporte(id,pessoa,mes,valor){abrirModalAporte(id,pessoa,mes,valor);}
+function excluirAporte(id,pessoa,mes){
+  document.getElementById('confirm-msg').textContent=`Excluir aporte de ${pessoa} em ${mes}?`;
+  document.getElementById('modal-confirm').classList.add('open');
+  document.getElementById('btn-confirm-ok').onclick=async()=>{
+    fecharModal('modal-confirm');syncShow('Excluindo...','sync');
+    try{await sbFetch(`aportes?id=eq.${id}`,'DELETE');syncShow('Excluído.','ok');await carregarAportes();carregarOverview();}
+    catch(e){syncShow('Erro: '+e.message,'err');}
+  };
+}
+function abrirModalComp(){document.getElementById('m-pessoa-comp').value=USUARIO;document.getElementById('modal-comp').classList.add('open');}
+function abrirModalExtrato(){document.getElementById('modal-extrato').classList.add('open');}
+function fecharModal(id){document.getElementById(id).classList.remove('open');}
+
+async function salvarAporte(){
+  const modal=document.getElementById('modal-aporte');
+  const pessoa=document.getElementById('m-pessoa-aporte').value;
+  const mes=document.getElementById('m-mes-aporte').value;
+  const valor=parseInt(document.getElementById('m-valor-aporte').value)||0;
+  if(!valor){alert('Informe o valor');return;}
+  syncShow('Salvando...','sync');
+  try{
+    if(modal.dataset.editId){await sbFetch(`aportes?id=eq.${modal.dataset.editId}`,'PATCH',{valor});}
+    else{await sbFetch('aportes','POST',{pessoa,mes,valor});}
+    fecharModal('modal-aporte');syncShow('Salvo!','ok');await carregarAportes();
+  }catch(e){syncShow('Erro: '+e.message,'err');}
+}
+
+async function salvarComp(){
+  const pessoa=document.getElementById('m-pessoa-comp').value;
+  const mes=document.getElementById('m-mes-comp').value;
+  const valor=parseInt(document.getElementById('m-valor-comp').value)||0;
+  const link=document.getElementById('m-link-comp').value;
+  const agora=new Date().toLocaleDateString('pt-BR');
+  syncShow('Salvando...','sync');
+  try{await sbFetch('comprovantes','POST',{pessoa,mes,valor,link,adicionado_em:agora,status:'Pendente'});fecharModal('modal-comp');syncShow('Adicionado!','ok');carregarComprovantes();}
+  catch(e){syncShow('Erro','err');}
+}
+
+async function salvarExtrato(){
+  const mes=document.getElementById('m-mes-extrato').value;
+  const saldo_real=parseInt(document.getElementById('m-saldo-extrato').value)||0;
+  const rendimentos=parseInt(document.getElementById('m-rendimentos-extrato').value)||0;
+  const composicao=document.getElementById('m-composicao-extrato').value;
+  const observacoes=document.getElementById('m-obs-extrato').value;
+  syncShow('Salvando...','sync');
+  try{await sbFetch('extratos','POST',{mes,saldo_real,rendimentos,composicao,observacoes,status:'Pendente',confirmado_por:''});fecharModal('modal-extrato');syncShow('Postado!','ok');carregarExtratos();}
+  catch(e){syncShow('Erro','err');}
+}
+
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+(function boot(){
+  const url=localStorage.getItem('tc_url_bo');
+  const key=localStorage.getItem('tc_key_bo');
+  const user=localStorage.getItem('tc_user_bo');
+  if(url&&key&&user)iniciarApp(url,key,user);
+})();
+</script>
+</body>
+</html>
